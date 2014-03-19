@@ -1,0 +1,9 @@
+{
+    "name" : "iMac",
+    "price": 1899.00,
+    "inventory": 20,
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ornare lorem a volutpat bibendum. Sed dui arcu, dictum sed nulla in, volutpat pulvinar felis. In nec tortor mi. Ut fermentum faucibus lacus, et malesuada urna porttitor a. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.",
+    "categories": ["CsRzTCJYT2ypJwmzBvUS_Q"],
+    "image": "/shop/static/images/couch.jpg",
+    "active": true
+}

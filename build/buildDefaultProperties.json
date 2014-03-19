@@ -1,0 +1,8 @@
+{
+    "deploydir": "/opt/appserver/webapps/shop",
+    "app": "/path/to/your/appshim",
+    "appDistUrl": "https://github.com/WebsterShop/Webapp/archive/builds.zip",
+    "appDistDir": "Webapp-builds",
+    "dist": "dist",
+    "src": "src"
+}

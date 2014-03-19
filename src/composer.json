@@ -1,0 +1,19 @@
+{
+    "name": "Webster/Shop",
+    "type": "project",
+    "description": "Webshop",
+    "version": "0.1.0",
+    "require": {
+        "ruflin/Elastica": "dev-master"
+    },
+    "authors": [
+        {
+            "name": "Florian Sydekum",
+            "email": "fs@techdivision.com"
+        },
+        {
+            "name": "Matthias Witte",
+            "email": "mw@techdivision.com"
+        }
+    ]
+}
