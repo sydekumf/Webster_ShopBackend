@@ -5,6 +5,8 @@ curl -XDELETE 'http://localhost:9200/shop'
 
 # set up index and mapping
 curl -XPOST 'http://localhost:9200/shop' -d @index.json
+curl -XPOST 'http://localhost:9200/shop/category/_mapping' -d @categories/mapping.json
+curl -XPOST 'http://localhost:9200/shop/product/_mapping' -d @products/mapping.json
 
 # set up categories
 curl -XPOST 'http://localhost:9200/shop/category/X1pXl3CwSkKXqhK-PBUIcQ' -d @categories/category1.json

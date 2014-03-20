@@ -1,0 +1,6 @@
+{
+    "category": {
+        "index_analyzer": "indexAnalyzer",
+        "search_analyzer": "searchAnalyzer"
+    }
+}

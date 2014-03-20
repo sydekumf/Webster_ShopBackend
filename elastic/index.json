@@ -1,0 +1,16 @@
+{
+    "number_of_shards": 4,
+    "number_of_replicas": 1,
+    "analysis": {
+        "analyzer": {
+            "indexAnalyzer": {
+                "type": "custom",
+                "tokenizer": "keyword"
+            },
+            "searchAnalyzer": {
+                "type": "custom",
+                "tokenizer": "keyword"
+            }
+        }
+    }
+}
