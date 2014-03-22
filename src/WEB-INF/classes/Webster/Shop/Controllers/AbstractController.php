@@ -46,7 +46,7 @@ class AbstractController
     {
         $this->websocketConnection = $connection;
 
-        $this->persistenceConnection = Factory::createContextConnection();
+        $this->persistenceConnection = Factory::createContextConnection('shop');
         $this->session = $this->persistenceConnection->createContextSession();
     }
 
