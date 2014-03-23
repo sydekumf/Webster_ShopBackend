@@ -59,6 +59,8 @@ class Category
      */
     private $active;
 
+    private $image;
+
     public function __construct($data)
     {
         if(is_object($data)){
@@ -69,6 +71,7 @@ class Category
         $this->setName($data['name']);
         $this->setDescription($data['description']);
         $this->setActive($data['active']);
+        $this->setImage($data['image']);
     }
 
     public function getElasticType($index)
@@ -104,7 +107,8 @@ class Category
             'id' => $this->getId(),
             'name' => $this->getName(),
             'description' => $this->getDescription(),
-            'active' => $this->getActive()
+            'active' => $this->getActive(),
+            'image' => $this->getImage()
         );
 
         // delete null entries
@@ -178,5 +182,21 @@ class Category
     public function getActive()
     {
         return $this->active;
+    }
+
+    /**
+     * @param mixed $image
+     */
+    public function setImage($image)
+    {
+        $this->image = $image;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getImage()
+    {
+        return $this->image;
     }
 }

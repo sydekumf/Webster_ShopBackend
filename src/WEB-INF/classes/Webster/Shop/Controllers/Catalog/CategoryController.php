@@ -27,7 +27,7 @@ class CategoryController extends AbstractController
     public function getAllAction($content)
     {
         if($categoryId = $content->category_id){
-            $categories = $this->getProxy(self::PROXY_CLASS)->findByCategoryId($categoryId);
+            $categories = $this->getProxy(self::PROXY_CLASS)->findById($categoryId);
         } else {
             $categories = $this->getProxy(self::PROXY_CLASS)->findAll();
         }

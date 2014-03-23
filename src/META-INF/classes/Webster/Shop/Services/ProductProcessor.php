@@ -104,7 +104,7 @@ class ProductProcessor extends AbstractProcessor
      */
     public function findByCategoryId($categoryId)
     {
-        $type = $this->getType();
+        require_once '/opt/appserver/webapps/shop/vendor/autoload.php';
 
         $term = new \Elastica\Query\Term();
         $term->setTerm('categories', $categoryId);
@@ -112,7 +112,7 @@ class ProductProcessor extends AbstractProcessor
         $query->setQuery($term);
 
         // query the product type
-        $productsData = $type->search($query)->getResults();
+        $productsData = $this->getType()->search($query)->getResults();
 
         $products = array();
         foreach($productsData as $entry){

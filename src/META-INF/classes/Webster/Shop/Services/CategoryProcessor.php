@@ -98,30 +98,16 @@ class CategoryProcessor extends AbstractProcessor
     }
 
     /**
-     * Returns all found categories filtered by category id.
+     * Returns a category by its id.
      *
      * @param $categoryId
      */
-    public function findByCategoryId($categoryId)
+    public function findById($categoryId)
     {
-        $type = $this->getType();
-
-        $term = new \Elastica\Query\Term();
-        $term->setTerm('categories', $categoryId);
-        $query = new \Elastica\Query();
-        $query->setQuery($term);
-
-        // query the product type
-        $categoryData = $this->getIndex()->search($query)->getResults();
-
-        $categories = array();
-        foreach($categoryData as $entry){
-            $data = $entry->getData();
-            $data['id'] = $entry->getId();
-            $categories[] = new Category($data);
-        }
-
-        return $categories;
+        $categoryData = $this->getType()->getDocument($categoryId);
+        $data = $categoryData->getData();
+        $data['id'] = $categoryData->getId();
+        return new Category($data);
     }
 
     /**
