@@ -1,6 +1,7 @@
 {
-  "name": "webstershop-server",
+  "name": "Webster_Shop",
   "version": "0.0.0",
+  "author": "Florian Sydekum",
   "dependencies": {},
   "devDependencies": {
     "grunt": "~0.4.1",
