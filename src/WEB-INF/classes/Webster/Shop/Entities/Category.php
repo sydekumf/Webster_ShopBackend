@@ -116,7 +116,7 @@ class Category
 
         // delete null entries
         foreach($result as $key => $value){
-            if(!$value){
+            if(is_null($value)){
                 unset($result[$key]);
             }
         }
