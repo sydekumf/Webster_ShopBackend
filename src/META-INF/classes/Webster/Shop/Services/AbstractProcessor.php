@@ -16,6 +16,7 @@
 
 namespace Webster\Shop\Services;
 
+use TechDivision\PersistenceContainerClient\Context\Connection\Factory;
 use TechDivision\ApplicationServer\Interfaces\ApplicationInterface;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Symfony\Component\Validator\Validation;
@@ -69,6 +70,16 @@ class AbstractProcessor
     protected $elastica;
 
     /**
+     * @var  $connection Holds the connection of the persistence container socket
+     */
+    protected $persistenceConnection;
+
+    /**
+     * @var  $session Holds the persistence container socket session
+     */
+    protected $session;
+
+    /**
      * Initializes the session bean with the Application instance.
      *
      * Checks on every start if the database already exists, if not
@@ -89,7 +100,22 @@ class AbstractProcessor
         $this->setApplication($application);
         $this->initConnectionParameters();
 
+        $this->persistenceConnection = Factory::createContextConnection('shop');
+        $this->session = $this->persistenceConnection->createContextSession();
+
         $this->createIndex();
+    }
+
+    /**
+     * Returns a proxy class for a given class name.
+     *
+     * @param $class The class name
+     * @return mixed
+     */
+    public function getProxy($class)
+    {
+        $initialContext = $this->session->createInitialContext();
+        return $initialContext->lookup($class);
     }
 
     /**

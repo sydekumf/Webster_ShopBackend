@@ -2,5 +2,6 @@
     "name" : "Elektronik",
     "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ornare lorem a volutpat bibendum. Sed dui arcu, dictum sed nulla in, volutpat pulvinar felis. In nec tortor mi. Ut fermentum faucibus lacus, et malesuada urna porttitor a. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.",
     "image": "/shop/static/images/category.jpg",
-    "active": true
+    "active": true,
+    "products": ["-NHf3RUbQVy4-hQaGdwjWg", "vv4TQOItS2C-nImSmCVL1g", "aFHd3glmR66zCXTewlLL1g", "j2y1lqQ-TbO_aGHywpuu9A", "qsIMbJYdSHSgZhferndHwQ"]
 }

@@ -60,6 +60,7 @@ class Category
     private $active;
 
     private $image;
+    private $products;
 
     public function __construct($data)
     {
@@ -72,6 +73,7 @@ class Category
         $this->setDescription($data['description']);
         $this->setActive($data['active']);
         $this->setImage($data['image']);
+        $this->setProducts($data['products']);
     }
 
     public function getElasticType($index)
@@ -108,7 +110,8 @@ class Category
             'name' => $this->getName(),
             'description' => $this->getDescription(),
             'active' => $this->getActive(),
-            'image' => $this->getImage()
+            'image' => $this->getImage(),
+            'products' => $this->getProducts()
         );
 
         // delete null entries
@@ -118,6 +121,22 @@ class Category
             }
         }
         return $result;
+    }
+
+    /**
+     * @param mixed $products
+     */
+    public function setProducts($products)
+    {
+        $this->products = $products;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getProducts()
+    {
+        return $this->products;
     }
 
     /**

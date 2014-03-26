@@ -59,7 +59,6 @@ class Product
     private $inventory;
     private $description;
     private $image;
-    private $categories;
 
     /**
      * @Assert\NotNull()
@@ -79,7 +78,6 @@ class Product
         $this->setInventory($data['inventory']);
         $this->setDescription($data['description']);
         $this->setImage($data['image']);
-        $this->setCategories($data['categories']);
         $this->setActive($data['active']);
     }
 
@@ -119,7 +117,6 @@ class Product
             'inventory' => $this->getInventory(),
             'description' => $this->getDescription(),
             'image' => $this->getImage(),
-            'categories' => $this->getCategories(),
             'active' => $this->getActive()
         );
 
@@ -130,22 +127,6 @@ class Product
             }
         }
         return $result;
-    }
-
-    /**
-     * @param mixed $categories
-     */
-    public function setCategories($categories)
-    {
-        $this->categories = $categories;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getCategories()
-    {
-        return $this->categories;
     }
 
     /**

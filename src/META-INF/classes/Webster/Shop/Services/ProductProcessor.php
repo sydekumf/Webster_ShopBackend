@@ -106,19 +106,11 @@ class ProductProcessor extends AbstractProcessor
     {
         require_once '/opt/appserver/webapps/shop/vendor/autoload.php';
 
-        $term = new \Elastica\Query\Term();
-        $term->setTerm('categories', $categoryId);
-        $query = new \Elastica\Query();
-        $query->setQuery($term);
+        $category = $this->getProxy('Webster\Shop\Services\CategoryProcessor')->findById($categoryId);
+        $productIds = $category->getProducts();
 
-        // query the product type
-        $productsData = $this->getType()->search($query)->getResults();
-
-        $products = array();
-        foreach($productsData as $entry){
-            $data = $entry->getData();
-            $data['id'] = $entry->getId();
-            $products[] = new Product($data);
+        foreach($productIds as $id){
+            $products[] = $this->findById($id);
         }
 
         return $products;
