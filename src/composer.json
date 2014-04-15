@@ -3,8 +3,18 @@
     "type": "project",
     "description": "Webshop",
     "version": "0.1.0",
+    "repositories":[
+        {
+            "type":"vcs",
+            "url":"http://github.com/MrHash/search"
+        }
+    ],
     "require": {
-        "ruflin/Elastica": "dev-master"
+        "doctrine/common":"2.3.*",
+        "doctrine/dbal":"2.3.*",
+        "jms/serializer":"0.15.0",
+        "ruflin/elastica":"v1.0.1.2",
+        "doctrine/search":"dev-master"
     },
     "authors": [
         {

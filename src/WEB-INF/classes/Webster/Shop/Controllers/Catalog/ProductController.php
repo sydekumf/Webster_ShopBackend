@@ -27,9 +27,9 @@ class ProductController extends AbstractController
     public function getAllAction($content)
     {
         if($categoryId = $content->category_id){
-            $products = $this->getProxy(self::PROXY_CLASS)->findByCategoryId($categoryId);
+            $products = $this->getProcessor()->findByCategoryId($categoryId);
         } else {
-            $products = $this->getProxy(self::PROXY_CLASS)->findAll();
+            $products = $this->getProcessor()->findAll();
         }
 
         $productMessage = new ProductMessage($products);
@@ -39,7 +39,7 @@ class ProductController extends AbstractController
     public function getAction($content)
     {
         $productId = $content->product_id;
-        $product = $this->getProxy(self::PROXY_CLASS)->findById($productId);
+        $product = $this->getProcessor()->findById($productId);
         $productMessage = new ProductMessage($product);
         $productMessage->send($this->websocketConnection);
     }
@@ -62,6 +62,6 @@ class ProductController extends AbstractController
     private function saveProduct($data)
     {
         $product = new Product($data);
-        return $this->getProxy(self::PROXY_CLASS)->persist($product);
+        return $this->getProcessor()->persist($product);
     }
 }

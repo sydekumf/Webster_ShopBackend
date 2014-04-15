@@ -127,7 +127,7 @@ module.exports = function (grunt) {
 
     grunt.registerTask('deploy', [
         'build',
-        'clean:deploy',
+//        'clean:deploy',
         'copy:deploy'
     ]);
 

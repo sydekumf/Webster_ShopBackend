@@ -10,6 +10,13 @@ use Webster\Shop\Handler\Dispatcher;
 class SocketHandler extends AbstractHandler
 {
     /**
+     * The key for the context param with the name of the settings file.
+     *
+     * @var string
+     */
+    const SETTINGS_FILE = 'settingsFile';
+
+    /**
      * @var  $dispatcher Dispatcher
      */
     protected $dispatcher;
@@ -21,7 +28,13 @@ class SocketHandler extends AbstractHandler
     {
         error_log('SocketHandler, init');
         parent::init($config);
-        $this->dispatcher = new Dispatcher($this->getApplication()->getWebappPath());
+
+        $settingsFile = $this->getHandlerManager()->getInitParameter(self::SETTINGS_FILE);
+        $settings = parse_ini_file(
+            $this->getApplication()->getWebappPath() . DIRECTORY_SEPARATOR . $settingsFile,
+            true
+        );
+        $this->dispatcher = new Dispatcher($settings);
     }
 
     /**

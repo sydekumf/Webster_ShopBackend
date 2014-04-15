@@ -14,10 +14,10 @@
  * @link       http://www.techdivision.com/
  */
 
-namespace Webster\Shop\Services;
+namespace Webster\Shop\Persistence\Catalog;
 
-use Webster\Shop\Services\AbstractProcessor;
 use Webster\Shop\Entities\Category;
+use Webster\Shop\Persistence\AbstractProcessor;
 
 /**
  * Webster\Shop\Services\CategoryProcessor
@@ -32,7 +32,6 @@ use Webster\Shop\Entities\Category;
  * @license    http://opensource.org/licenses/osl-3.0.php
  *             Open Software License (OSL 3.0)
  * @link       http://www.techdivision.com/
- * @Singleton
  */
 class CategoryProcessor extends AbstractProcessor
 {
@@ -70,29 +69,11 @@ class CategoryProcessor extends AbstractProcessor
     {
         require_once '/opt/appserver/webapps/shop/vendor/autoload.php';
 
-        $categoryData = $category->toArray();
-        // category id is not part of the document's content
-        unset($categoryData['id']);
+        /* @var $sm Doctrine\Search\SearchManager */
+        $sm = $this->getSearchManager();
 
-        $type = $this->getType();
-
-        // create a document
-        $categoryDocument = new \Elastica\Document('', $categoryData);
-
-        // check if category already exists
-        if(!$categoryId = $category->getId()){
-            // category does not exist
-            $this->validateEntity($category);
-            $type->addDocument($categoryDocument);
-        } else {
-            // category already exists
-            $this->validateEntity($category, array_keys($categoryData));
-            $categoryDocument->setId($categoryId);
-            $type->updateDocument($categoryDocument);
-        }
-
-        // Refresh Index
-        $type->getIndex()->refresh();
+        $sm->persist($category);
+        $sm->flush();
 
         return $category;
     }

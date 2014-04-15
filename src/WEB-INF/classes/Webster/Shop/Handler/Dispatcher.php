@@ -1,7 +1,9 @@
 <?php
 
 namespace Webster\Shop\Handler;
+
 use Ratchet\ConnectionInterface;
+use TechDivision\ApplicationServer\Interfaces\ApplicationInterface;
 
 /**
  * <REPLACE WITH FILE DESCRIPTION>
@@ -20,13 +22,13 @@ use Ratchet\ConnectionInterface;
 class Dispatcher
 {
     /**
-     * @var  $webappPath Holds the webapp path
+     * @var $settings array Holds the app settings
      */
-    protected $webappPath;
+    protected $settings;
 
-    public function __construct($webappPath)
+    public function __construct(array $settings)
     {
-        $this->webappPath = $webappPath;
+        $this->settings = $settings;
     }
 
     public function dispatchMessage($message, ConnectionInterface $connection)
@@ -39,17 +41,26 @@ class Dispatcher
         }
 
         $controllerClass = 'Webster\\Shop\\Controllers\\' . $message->type . 'Controller';
+        $persistenceClass = 'Webster\\Shop\\Persistence\\' . $message->type . 'Processor';
         $action = $message->action . 'Action';
 
-        if(!class_exists($controllerClass)){
-            throw new \Exception('The message could not be processed.');
+        if(!class_exists($controllerClass) || !class_exists($persistenceClass)){
+            throw new \Exception('Controller or persistence class could not be found.' . $persistenceClass);
         }
-        $controller = new $controllerClass($connection);
+
+        $settings = $this->getSettings();
+
+        if(!array_key_exists('elasticsearch', $settings)){
+            throw new \Exception('No connection parameters for elasticsearch found.');
+        }
+
+        $processor = new $persistenceClass($settings['elasticsearch']);
+        $controller = new $controllerClass($connection, $processor);
         $controller->$action($message->content);
     }
 
-    public function getWebappPath()
+    public function getSettings()
     {
-        return $this->webappPath;
+        return $this->settings;
     }
 }

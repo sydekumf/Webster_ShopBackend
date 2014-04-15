@@ -27,9 +27,9 @@ class CategoryController extends AbstractController
     public function getAllAction($content)
     {
         if($categoryId = $content->category_id){
-            $categories = $this->getProxy(self::PROXY_CLASS)->findById($categoryId);
+            $categories = $this->getProcessor()->findById($categoryId);
         } else {
-            $categories = $this->getProxy(self::PROXY_CLASS)->findAll();
+            $categories = $this->getProcessor()->findAll();
         }
 
         $categoryMessage = new CategoryMessage($categories);
@@ -54,6 +54,6 @@ class CategoryController extends AbstractController
     private function saveCategory($data)
     {
         $category = new Category($data);
-        return $this->getProxy(self::PROXY_CLASS)->persist($category);
+        return $this->getProcessor()->persist($category);
     }
 }

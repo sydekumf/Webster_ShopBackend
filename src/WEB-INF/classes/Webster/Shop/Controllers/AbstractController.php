@@ -5,6 +5,7 @@ namespace Webster\Shop\Controllers;
 use TechDivision\PersistenceContainerClient\Context\Connection\Factory;
 use Ratchet\ConnectionInterface;
 use Webster\Shop\Handler\Dispatcher;
+use Webster\Shop\Persistence\AbstractProcessor;
 
 /**
  * <REPLACE WITH FILE DESCRIPTION>
@@ -23,42 +24,28 @@ use Webster\Shop\Handler\Dispatcher;
 class AbstractController
 {
     /**
-     * @var  $connection Holds the connection of the persistence container socket
-     */
-    protected $persistenceConnection;
-
-    /**
-     * @var  $session Holds the persistence container socket session
-     */
-    protected $session;
-
-    /**
      * @var  $webSocketConnection Holds the connection of the websocket
      */
     protected $websocketConnection;
+
+    /**
+     * @var  $processor AbstractProcessor
+     */
+    protected $processor;
 
     /**
      * Constructor which takes the websocket connection to the client.
      *
      * @param ConnectionInterface $con
      */
-    public function __construct(ConnectionInterface $connection)
+    public function __construct(ConnectionInterface $connection, AbstractProcessor $processor)
     {
         $this->websocketConnection = $connection;
-
-        $this->persistenceConnection = Factory::createContextConnection('shop');
-        $this->session = $this->persistenceConnection->createContextSession();
+        $this->processor = $processor;
     }
 
-    /**
-     * Returns a proxy class for a given class name.
-     *
-     * @param $class The class name
-     * @return mixed
-     */
-    public function getProxy($class)
+    public function getProcessor()
     {
-        $initialContext = $this->session->createInitialContext();
-        return $initialContext->lookup($class);
+        return $this->processor;
     }
 }

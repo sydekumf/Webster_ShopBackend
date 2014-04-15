@@ -1,8 +1,0 @@
-<datasources>
-    <datasource name="Webster" type="TechDivision\PersistenceContainer\Application">
-        <database>
-            <user>localhost</user>
-            <password>9200</password>
-        </database>
-    </datasource>
-</datasources>

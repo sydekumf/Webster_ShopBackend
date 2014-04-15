@@ -16,9 +16,8 @@
 
 namespace Webster\Shop\Entities;
 
-use Symfony\Component\Validator\ExecutionContextInterface;
-use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Constraints\NotBlank;
+use JMS\Serializer\Annotation as JMS;
+use Doctrine\Search\Mapping\Annotations as MAP;
 
 /**
  * Webster\Shop\Entities\Product
@@ -34,36 +33,58 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  *             Open Software License (OSL 3.0)
  * @link       http://www.techdivision.com/
  */
+/**
+ * @JMS\ExclusionPolicy("all")
+ * @MAP\ElasticSearchable(index="shop", type="product", source=true)
+ */
 class Product
 {
-    const ELASTIC_TYPE = 'product';
-
+    /**
+     * @MAP\Id
+     * @JMS\Type("string")
+     * @JMS\Expose
+     */
     private $id;
 
     /**
-     * @Assert\NotBlank()
-     * @Assert\Length(
-     *      min = "2",
-     *      max = "50",
-     *      minMessage = "The name must be at least {{ limit }} characters length",
-     *      maxMessage = "The name cannot be longer than {{ limit }} characters length"
-     * )
+     * @JMS\Type("string")
+     * @JMS\Expose
+     * @MAP\ElasticField(type="string", includeInAll=false, index="no")
      */
     private $name;
 
     /**
-     * @Assert\NotBlank()
+     * @JMS\Type("double")
+     * @JMS\Expose
+     * @MAP\ElasticField(type="float", includeInAll=false, index="no")
      */
     private $price;
 
+    /**
+     * @JMS\Type("integer")
+     * @JMS\Expose
+     * @MAP\ElasticField(type="integer", includeInAll=false, index="no")
+     */
     private $inventory;
-    private $description;
-    private $image;
-    private $categories;
 
     /**
-     * @Assert\NotNull()
-     * @Assert\Type(type="bool", message="The value {{ value }} is not a valid {{ type }}.")
+     * @JMS\Type("string")
+     * @JMS\Expose
+     * @MAP\ElasticField(type="string", includeInAll=false, index="no")
+     */
+    private $description;
+
+    /**
+     * @JMS\Type("string")
+     * @JMS\Expose
+     * @MAP\ElasticField(type="string", includeInAll=false, index="no")
+     */
+    private $image;
+
+    /**
+     * @JMS\Type("boolean")
+     * @JMS\Expose
+     * @MAP\ElasticField(type="boolean", includeInAll=false, index="no")
      */
     private $active;
 
@@ -79,13 +100,7 @@ class Product
         $this->setInventory($data['inventory']);
         $this->setDescription($data['description']);
         $this->setImage($data['image']);
-        $this->setCategories($data['categories']);
         $this->setActive($data['active']);
-    }
-
-    public function getElasticType($index)
-    {
-        return $index->getType(self::ELASTIC_TYPE);
     }
 
     public static function createMapping($elasticaIndex)
@@ -119,7 +134,6 @@ class Product
             'inventory' => $this->getInventory(),
             'description' => $this->getDescription(),
             'image' => $this->getImage(),
-            'categories' => $this->getCategories(),
             'active' => $this->getActive()
         );
 
@@ -130,22 +144,6 @@ class Product
             }
         }
         return $result;
-    }
-
-    /**
-     * @param mixed $categories
-     */
-    public function setCategories($categories)
-    {
-        $this->categories = $categories;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getCategories()
-    {
-        return $this->categories;
     }
 
     /**

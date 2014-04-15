@@ -14,10 +14,10 @@
  * @link       http://www.techdivision.com/
  */
 
-namespace Webster\Shop\Services;
+namespace Webster\Shop\Persistence\Catalog;
 
-use Webster\Shop\Services\AbstractProcessor;
 use Webster\Shop\Entities\Product;
+use Webster\Shop\Persistence\AbstractProcessor;
 
 /**
  * Webster\Shop\Services\ProductProcessor
@@ -32,7 +32,6 @@ use Webster\Shop\Entities\Product;
  * @license    http://opensource.org/licenses/osl-3.0.php
  *             Open Software License (OSL 3.0)
  * @link       http://www.techdivision.com/
- * @Singleton
  */
 class ProductProcessor extends AbstractProcessor
 {
@@ -70,29 +69,11 @@ class ProductProcessor extends AbstractProcessor
     {
         require_once '/opt/appserver/webapps/shop/vendor/autoload.php';
 
-        $productData = $product->toArray();
-        // product id is not part of the document's content
-        unset($productData['id']);
+        /* @var $sm Doctrine\Search\SearchManager */
+        $sm = $this->getSearchManager();
 
-        $type = $this->getType();
-
-        // create a document
-        $productDocument = new \Elastica\Document('', $productData);
-
-        // check if product already exists
-        if(!$productId = $product->getId()){
-            // product does not exist
-            $this->validateEntity($product);
-            $type->addDocument($productDocument);
-        } else {
-            // product already exists
-            $this->validateEntity($product, array_keys($productData));
-            $productDocument->setId($productId);
-            $type->updateDocument($productDocument);
-        }
-
-        // Refresh Index
-        $type->getIndex()->refresh();
+        $sm->persist($product);
+        $sm->flush();
 
         return $product;
     }
@@ -106,12 +87,15 @@ class ProductProcessor extends AbstractProcessor
     {
         require_once '/opt/appserver/webapps/shop/vendor/autoload.php';
 
-        $category = $this->getProxy('Webster\Shop\Services\CategoryProcessor')->findById($categoryId);
+        $sm = $this->getSearchManager();
+
+        $category = $sm->getRepository('Webster\Shop\Entities\Category')->find($categoryId);
         $productIds = $category->getProducts();
 
         foreach($productIds as $id){
             $products[] = $this->findById($id);
         }
+        error_log(var_export($products, true));
 
         return $products;
     }

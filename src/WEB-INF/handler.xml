@@ -16,4 +16,9 @@
         <url-pattern>/socket</url-pattern>
     </handler-mapping>
 
+    <context-param>
+        <param-name>settingsFile</param-name>
+        <param-value>WEB-INF/settings.properties</param-value>
+    </context-param>
+
 </web-app>

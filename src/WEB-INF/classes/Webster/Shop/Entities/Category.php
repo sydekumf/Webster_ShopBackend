@@ -16,9 +16,8 @@
 
 namespace Webster\Shop\Entities;
 
-use Symfony\Component\Validator\ExecutionContextInterface;
-use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Constraints\NotBlank;
+use JMS\Serializer\Annotation as JMS;
+use Doctrine\Search\Mapping\Annotations as MAP;
 
 /**
  * Webster\Shop\Entities\Category
@@ -34,32 +33,52 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  *             Open Software License (OSL 3.0)
  * @link       http://www.techdivision.com/
  */
+/**
+ * @JMS\ExclusionPolicy("all")
+ * @MAP\ElasticSearchable(index="shop", type="category", source=true)
+ */
 class Category
 {
-    const ELASTIC_TYPE = 'category';
-
+    /**
+     * @MAP\Id
+     * @JMS\Type("string")
+     * @JMS\Expose
+     */
     private $id;
 
     /**
-     * @Assert\NotBlank()
-     * @Assert\Length(
-     *      min = "2",
-     *      max = "50",
-     *      minMessage = "The name must be at least {{ limit }} characters length",
-     *      maxMessage = "The name cannot be longer than {{ limit }} characters length"
-     * )
+     * @JMS\Type("string")
+     * @JMS\Expose
+     * @MAP\ElasticField(type="string", includeInAll=false, index="no")
      */
     private $name;
 
+    /**
+     * @JMS\Type("string")
+     * @JMS\Expose
+     * @MAP\ElasticField(type="string", includeInAll=false, index="no")
+     */
     private $description;
 
     /**
-     * @Assert\NotNull()
-     * @Assert\Type(type="bool", message="The value {{ value }} is not a valid {{ type }}.")
+     * @JMS\Type("boolean")
+     * @JMS\Expose
+     * @MAP\ElasticField(type="boolean", includeInAll=false, index="no")
      */
     private $active;
 
+    /**
+     * @JMS\Type("string")
+     * @JMS\Expose
+     * @MAP\ElasticField(type="string", includeInAll=false, index="no")
+     */
     private $image;
+
+    /**
+     * @JMS\Type("array")
+     * @JMS\Expose
+     * @MAP\ElasticField(type="string", includeInAll=false, index="not_analyzed")
+     */
     private $products;
 
     public function __construct($data)
@@ -74,11 +93,6 @@ class Category
         $this->setActive($data['active']);
         $this->setImage($data['image']);
         $this->setProducts($data['products']);
-    }
-
-    public function getElasticType($index)
-    {
-        return $index->getType(self::ELASTIC_TYPE);
     }
 
     public static function createMapping($elasticaIndex)
