@@ -24,23 +24,17 @@ class ProductController extends AbstractController
 {
     const PROXY_CLASS = 'Webster\Shop\Services\ProductProcessor';
 
-    public function getAllAction($content)
+    public function getAction($content)
     {
         if($categoryId = $content->category_id){
             $products = $this->getProcessor()->findByCategoryId($categoryId);
+        } else if($productId = $content->product_id){
+            $products = $this->getProcessor()->findById($productId);
         } else {
             $products = $this->getProcessor()->findAll();
         }
 
         $productMessage = new ProductMessage($products);
-        $productMessage->send($this->websocketConnection);
-    }
-
-    public function getAction($content)
-    {
-        $productId = $content->product_id;
-        $product = $this->getProcessor()->findById($productId);
-        $productMessage = new ProductMessage($product);
         $productMessage->send($this->websocketConnection);
     }
 

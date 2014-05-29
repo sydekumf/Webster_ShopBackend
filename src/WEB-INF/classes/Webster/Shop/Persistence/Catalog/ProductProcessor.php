@@ -95,7 +95,6 @@ class ProductProcessor extends AbstractProcessor
         foreach($productIds as $id){
             $products[] = $this->findById($id);
         }
-        error_log(var_export($products, true));
 
         return $products;
     }

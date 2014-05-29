@@ -24,7 +24,7 @@ class CategoryController extends AbstractController
 {
     const PROXY_CLASS = 'Webster\Shop\Services\CategoryProcessor';
 
-    public function getAllAction($content)
+    public function getAction($content)
     {
         if($categoryId = $content->category_id){
             $categories = $this->getProcessor()->findById($categoryId);
