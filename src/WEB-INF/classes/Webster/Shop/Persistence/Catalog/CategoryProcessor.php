@@ -37,27 +37,33 @@ class CategoryProcessor extends AbstractProcessor
 {
     const ELASTIC_TYPE = 'category';
 
-    /**
-     * Returns all found categories.
-     *
-     * @return array
-     */
-    public function findAll()
-    {
-        $type = $this->getType();
-
-        // query the category type
-        $categoryData = $type->search()->getResults();
-
-        $categories = array();
-        foreach($categoryData as $entry){
-            $data = $entry->getData();
-            $data['id'] = $entry->getId();
-            $categories[] = new Category($data);
-        }
-
-        return $categories;
-    }
+//    /**
+//     * Returns all found categories.
+//     *
+//     * @return array
+//     */
+//    public function findAll($ids = null)
+//    {
+//        $query = new \Elastica\Query();
+//        $type = $this->getType();
+//
+//        if(is_array($ids)){
+//            $idsFilter = new \Elastica\Filter\Ids($type, $ids);
+//            $query->setFilter($idsFilter);
+//        }
+//
+//        // query the category type
+//        $categoryData = $type->search($query)->getResults();
+//
+//        $categories = array();
+//        foreach($categoryData as $entry){
+//            $data = $entry->getData();
+//            $data['id'] = $entry->getId();
+//            $categories[] = new Category($data);
+//        }
+//
+//        return $categories;
+//    }
 
     /**
      * Persists the passed entity.
@@ -78,18 +84,18 @@ class CategoryProcessor extends AbstractProcessor
         return $category;
     }
 
-    /**
-     * Returns a category by its id.
-     *
-     * @param $categoryId
-     */
-    public function findById($categoryId)
-    {
-        $categoryData = $this->getType()->getDocument($categoryId);
-        $data = $categoryData->getData();
-        $data['id'] = $categoryData->getId();
-        return new Category($data);
-    }
+//    /**
+//     * Returns a category by its id.
+//     *
+//     * @param $categoryId
+//     */
+//    public function findById($categoryId)
+//    {
+//        $categoryData = $this->getType()->getDocument($categoryId);
+//        $data = $categoryData->getData();
+//        $data['id'] = $categoryData->getId();
+//        return new Category($data);
+//    }
 
     /**
      * Returns the elasticsearch index.

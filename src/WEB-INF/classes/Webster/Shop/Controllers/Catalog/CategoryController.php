@@ -5,6 +5,8 @@ namespace Webster\Shop\Controllers\Catalog;
 use Webster\Shop\Controllers\AbstractController;
 use Webster\Shop\Messages\CategoryMessage;
 use Webster\Shop\Entities\Category;
+use Webster\Shop\Persistence\Catalog\CategoryProcessor;
+use Ratchet\ConnectionInterface;
 
 /**
  * <REPLACE WITH FILE DESCRIPTION>
@@ -22,7 +24,11 @@ use Webster\Shop\Entities\Category;
  */
 class CategoryController extends AbstractController
 {
-    const PROXY_CLASS = 'Webster\Shop\Services\CategoryProcessor';
+    public function __construct(ConnectionInterface $connection, $settings)
+    {
+        parent::__construct($connection, $settings);
+        $this->setProcessor(new CategoryProcessor($this->getSettings()));
+    }
 
     public function getAction($content)
     {

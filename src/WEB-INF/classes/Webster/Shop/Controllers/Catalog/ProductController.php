@@ -5,6 +5,8 @@ namespace Webster\Shop\Controllers\Catalog;
 use Webster\Shop\Controllers\AbstractController;
 use Webster\Shop\Messages\ProductMessage;
 use Webster\Shop\Entities\Product;
+use Webster\Shop\Persistence\Catalog\ProductProcessor;
+use Ratchet\ConnectionInterface;
 
 /**
  * <REPLACE WITH FILE DESCRIPTION>
@@ -22,7 +24,11 @@ use Webster\Shop\Entities\Product;
  */
 class ProductController extends AbstractController
 {
-    const PROXY_CLASS = 'Webster\Shop\Services\ProductProcessor';
+    public function __construct(ConnectionInterface $connection, $settings)
+    {
+        parent::__construct($connection, $settings);
+        $this->setProcessor(new ProductProcessor($this->getSettings()));
+    }
 
     public function getAction($content)
     {

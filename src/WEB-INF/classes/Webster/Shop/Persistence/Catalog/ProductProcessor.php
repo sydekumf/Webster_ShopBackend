@@ -35,29 +35,57 @@ use Webster\Shop\Persistence\AbstractProcessor;
  */
 class ProductProcessor extends AbstractProcessor
 {
-    const ELASTIC_TYPE = 'product';
-
-    /**
-     * Returns all found products.
-     *
-     * @return array
-     */
-    public function findAll()
+    public function update(Product $product)
     {
-        $type = $this->getType();
+        $this->persist($product);
 
-        // query the product type
-        $productsData = $type->search()->getResults();
-
-        $products = array();
-        foreach($productsData as $entry){
-            $data = $entry->getData();
-            $data['id'] = $entry->getId();
-            $products[] = new Product($data);
-        }
-
-        return $products;
+//        $oldProduct = $this->findById($product->getId());
+//        $oldCategories = $oldProduct->getCategories();
+//        $categories = $product->getCategories();
+//
+//        $deleteCategoryIds = array_diff($oldCategories, $categories);
+//        $newCategoryIds = array_diff($categories, $oldCategories);
+//
+//        $categoryProcessor = new CategoryProcessor($this->getConnectionParameters());
+//
+//        foreach($categoryProcessor->findAll($deleteCategoryIds) as $category){
+//            $category->removeProduct($product);
+//            $categoryProcessor->persist($category);
+//        }
+//
+//        foreach($categoryProcessor->findAll($newCategoryIds) as $category){
+//            $category->addProduct($product);
+//            $categoryProcessor->persist($category);
+//        }
     }
+
+//    /**
+//     * Returns all found products.
+//     *
+//     * @return array
+//     */
+//    public function findAll($ids = null)
+//    {
+//        $query = new \Elastica\Query();
+//        $type = $this->getType();
+//
+//        if(is_array($ids)){
+//            $idsFilter = new \Elastica\Filter\Ids($type, $ids);
+//            $query->setFilter($idsFilter);
+//        }
+//
+//        // query the product type
+//        $productData = $type->search($query)->getResults();
+//
+//        $products = array();
+//        foreach($productData as $entry){
+//            $data = $entry->getData();
+//            $data['id'] = $entry->getId();
+//            $products[] = new Product($data);
+//        }
+//
+//        return $products;
+//    }
 
     /**
      * Persists the passed entity.
@@ -78,59 +106,37 @@ class ProductProcessor extends AbstractProcessor
         return $product;
     }
 
-    /**
-     * Returns all found products filtered by category id.
-     *
-     * @param $categoryId
-     */
-    public function findByCategoryId($categoryId)
-    {
-        require_once '/opt/appserver/webapps/shop/vendor/autoload.php';
+//    /**
+//     * Returns all found products filtered by category id.
+//     *
+//     * @param $categoryId
+//     */
+//    public function findByCategoryId($categoryId)
+//    {
+//        require_once '/opt/appserver/webapps/shop/vendor/autoload.php';
+//
+//        $sm = $this->getSearchManager();
+//
+//        $category = $sm->getRepository('Webster\Shop\Entities\Category')->find($categoryId);
+//        $productIds = $category->getProducts();
+//
+//        foreach($productIds as $id){
+//            $products[] = $this->findById($id);
+//        }
+//
+//        return $products;
+//    }
 
-        $sm = $this->getSearchManager();
-
-        $category = $sm->getRepository('Webster\Shop\Entities\Category')->find($categoryId);
-        $productIds = $category->getProducts();
-
-        foreach($productIds as $id){
-            $products[] = $this->findById($id);
-        }
-
-        return $products;
-    }
-
-    /**
-     * Returns a product by its id.
-     *
-     * @param $productId
-     */
-    public function findById($productId)
-    {
-        $productData = $this->getType()->getDocument($productId);
-        $data = $productData->getData();
-        $data['id'] = $productData->getId();
-        return new Product($data);
-    }
-
-    /**
-     * Returns the elasticsearch index.
-     *
-     * @return \Elastica\Index
-     */
-    protected function getIndex()
-    {
-        $elastica = $this->getElasticaClient();
-        return $elastica->getIndex(self::ELASTIC_INDEX);
-    }
-
-    /**
-     * Returns the elasticsearch type.
-     *
-     * @return \Elastica\Type
-     */
-    protected function getType()
-    {
-        $index = $this->getIndex();
-        return $index->getType(self::ELASTIC_TYPE);
-    }
+//    /**
+//     * Returns a product by its id.
+//     *
+//     * @param $productId
+//     */
+//    public function findById($productId)
+//    {
+//        $productData = $this->getType()->getDocument($productId);
+//        $data = $productData->getData();
+//        $data['id'] = $productData->getId();
+//        return new Product($data);
+//    }
 }

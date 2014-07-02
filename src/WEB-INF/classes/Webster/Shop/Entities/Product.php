@@ -18,6 +18,7 @@ namespace Webster\Shop\Entities;
 
 use JMS\Serializer\Annotation as JMS;
 use Doctrine\Search\Mapping\Annotations as MAP;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Webster\Shop\Entities\Product
@@ -37,7 +38,7 @@ use Doctrine\Search\Mapping\Annotations as MAP;
  * @JMS\ExclusionPolicy("all")
  * @MAP\ElasticSearchable(index="shop", type="product", source=true)
  */
-class Product
+class Product implements \JsonSerializable
 {
     /**
      * @MAP\Id
@@ -85,8 +86,17 @@ class Product
      * @JMS\Type("boolean")
      * @JMS\Expose
      * @MAP\ElasticField(type="boolean", includeInAll=false, index="no")
+     * @ORM\ManyToMany(targetEntity="Webster\Shop\Entities\ROFFEL", mappedBy="oida")
      */
     private $active;
+
+    /**
+     * @JMS\Type("array")
+     * @JMS\Expose
+     * @MAP\ElasticField(type="string", includeInAll=false, index="not_analyzed")
+     * @ORM\ManyToMany(targetEntity="Webster\Shop\Entities\Category", mappedBy="products")
+     */
+    private $categories;
 
     public function __construct($data)
     {
@@ -101,23 +111,7 @@ class Product
         $this->setDescription($data['description']);
         $this->setImage($data['image']);
         $this->setActive($data['active']);
-    }
-
-    public static function createMapping($elasticaIndex)
-    {
-        require_once '/opt/appserver/webapps/webstershop/vendor/autoload.php';
-
-        //Create a type
-        $elasticaType = $elasticaIndex->getType(self::ELASTIC_TYPE);
-
-        // Define mapping
-        $mapping = new \Elastica\Type\Mapping();
-        $mapping->setType($elasticaType);
-        $mapping->setParam('index_analyzer', 'indexAnalyzer');
-        $mapping->setParam('search_analyzer', 'searchAnalyzer');
-
-        // Send mapping to type
-        $mapping->send();
+        $this->setCategories($data['categories']);
     }
 
     /**
@@ -125,7 +119,7 @@ class Product
      *
      * @return array
      */
-    public function toArray()
+    public function jsonSerialize()
     {
         $result =  array(
             'id' => $this->getId(),
@@ -134,7 +128,8 @@ class Product
             'inventory' => $this->getInventory(),
             'description' => $this->getDescription(),
             'image' => $this->getImage(),
-            'active' => $this->getActive()
+            'active' => $this->getActive(),
+            'categories' => $this->getCategories()
         );
 
         // delete null entries
@@ -256,5 +251,21 @@ class Product
     public function getActive()
     {
         return $this->active;
+    }
+
+    /**
+     * @param mixed $categories
+     */
+    public function setCategories($categories)
+    {
+        $this->categories = $categories;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCategories()
+    {
+        return $this->categories;
     }
 }

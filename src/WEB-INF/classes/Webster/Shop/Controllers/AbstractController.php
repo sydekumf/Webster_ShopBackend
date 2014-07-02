@@ -2,8 +2,6 @@
 
 namespace Webster\Shop\Controllers;
 
-use TechDivision\PersistenceContainerClient\Context\Connection\Factory;
-use Ratchet\ConnectionInterface;
 use Webster\Shop\Handler\Dispatcher;
 use Webster\Shop\Persistence\AbstractProcessor;
 
@@ -24,28 +22,37 @@ use Webster\Shop\Persistence\AbstractProcessor;
 class AbstractController
 {
     /**
-     * @var  $webSocketConnection Holds the connection of the websocket
-     */
-    protected $websocketConnection;
-
-    /**
      * @var  $processor AbstractProcessor
      */
     protected $processor;
 
     /**
-     * Constructor which takes the websocket connection to the client.
-     *
-     * @param ConnectionInterface $con
+     * @var  $settings array
      */
-    public function __construct(ConnectionInterface $connection, AbstractProcessor $processor)
+    protected $settings;
+
+    /**
+     * Constructor which takes several settings.
+     *
+     * @param $settings mixed
+     */
+    public function __construct($settings)
     {
-        $this->websocketConnection = $connection;
-        $this->processor = $processor;
+        $this->settings = $settings;
     }
 
     public function getProcessor()
     {
         return $this->processor;
+    }
+
+    public function setProcessor(AbstractProcessor $processor)
+    {
+        $this->processor = $processor;
+    }
+
+    public function getSettings()
+    {
+        return $this->settings;
     }
 }

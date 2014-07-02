@@ -47,8 +47,6 @@ use JMS\Serializer\SerializationContext;
  */
 class AbstractProcessor
 {
-    const ELASTIC_INDEX = 'shop';
-
     /**
      * Entity namespace
      *
@@ -71,9 +69,14 @@ class AbstractProcessor
     protected $sm;
 
     /**
-     * @var  $connectionParameters array
+     * @var  $readAdapter ReadAdapter
      */
-    protected $connectionParameters;
+    protected $readAdapter;
+
+    /**
+     * @var  $settings array
+     */
+    protected $settings;
 
     /**
      * Initializes the session bean with the Application instance.
@@ -86,10 +89,17 @@ class AbstractProcessor
      *
      * @return void
      */
-    public function __construct(array $connectionParameters)
+    public function __construct(array $settings)
     {
-        $this->connectionParameters = $connectionParameters;
-        $this->entityNamespace = array('namespace' => 'Entities', 'path' => '.');
+        $this->settings = $settings;
+
+        $readAdapterClassName = $settings['adapter']['read'];
+        $this->readAdapter = new $readAdapterClassName(
+            $this->getElasticaClient(),
+            $settings['elasticsearch']['index']
+        );
+
+        $this->entityNamespace = array('namespace' => 'Webster\\Shop\\Entities', 'path' => '.');
 
         AnnotationRegistry::registerAutoloadNamespace(
             'JMS\Serializer\Annotation',
@@ -99,8 +109,12 @@ class AbstractProcessor
             'Doctrine\Search\Mapping\Annotations',
             "/opt/appserver/webapps/shop/vendor/doctrine/search/lib"
         );
+        AnnotationRegistry::registerAutoloadNamespace(
+            'Doctrine\ORM\Mapping',
+            "/opt/appserver/app/code/vendor/doctrine/orm/lib"
+        );
 
-        $this->_setupDoctrine();
+        $this->_setupDoctrine($settings['adapter']['relationHandler']);
     }
 
     /**
@@ -158,7 +172,10 @@ class AbstractProcessor
      */
     public function getConnectionParameters()
     {
-        return $this->connectionParameters;
+        return array(
+            'host' => $this->settings['elasticsearch']['host'],
+            'port' => $this->settings['elasticsearch']['port']
+        );
     }
 
     /**
@@ -186,7 +203,12 @@ class AbstractProcessor
         return $this->sm;
     }
 
-    protected function _setUpDoctrine()
+    public function getReadAdapter()
+    {
+        return $this->readAdapter;
+    }
+
+    protected function _setUpDoctrine($relationHandlerClassName)
     {
         require_once '/opt/appserver/webapps/shop/vendor/autoload.php';
 
@@ -215,5 +237,94 @@ class AbstractProcessor
             new ElasticaAdapter($this->getElasticaClient()),
             new EventManager()
         );
+
+        if($relationHandlerClassName){
+            $relationHandler = new $relationHandlerClassName($this->getReadAdapter());
+            $this->sm->getEventManager()->addEventSubscriber($relationHandler);
+        }
+    }
+
+//    /**
+//     * Returns the elasticsearch index.
+//     *
+//     * @return \Elastica\Index
+//     */
+//    protected function getIndex()
+//    {
+//        $elastica = $this->getElasticaClient();
+//        return $elastica->getIndex($this->_getIndexName());
+//    }
+//
+//    /**
+//     * Returns the elasticsearch type.
+//     *
+//     * @return \Elastica\Type
+//     */
+//    protected function getType()
+//    {
+//        if(!$this->_getTypeName()){
+//            return null;
+//        }
+//        $index = $this->getIndex();
+//        return $index->getType($this->_getTypeName());
+//    }
+
+    /**
+     * Returns all found entities optionally filtered by an array of ids.
+     *
+     * @return array
+     */
+    public function findAll($ids = null)
+    {
+        return $this->getReadAdapter()
+            ->findAll(
+                $this->_getEntityClassName(),
+                $this->_getTypeName(),
+                $ids
+            );
+    }
+
+    /**
+     * Returns an entity by its id.
+     *
+     * @param $productId
+     */
+    public function findById($id)
+    {
+        return $this->getReadAdapter()
+            ->findById(
+                $this->_getEntityClassName(),
+                $this->_getTypeName(),
+                $id
+            );
+    }
+
+    /**
+     * Returns the full class name for the current processor's entity.
+     *
+     * @return string
+     */
+    protected function _getEntityClassName()
+    {
+        $en = $this->getEntityNamespace();
+        return $en['namespace'] . '\\' . ucfirst($this->_getTypeName());
+    }
+
+    /**
+     * Returns the type name as a string for the current processor's entity.
+     *
+     * @return string
+     */
+    protected function _getTypeName()
+    {
+        $processorName = explode('\\', get_class($this));
+        $typeName = end($processorName);
+        $typeName = substr($typeName, 0, strlen($typeName) - strlen('Processor'));
+        return lcfirst($typeName);
+    }
+
+    protected function _getIndexName()
+    {
+        return $this->settings['elasticsearch']['index'];
     }
 }

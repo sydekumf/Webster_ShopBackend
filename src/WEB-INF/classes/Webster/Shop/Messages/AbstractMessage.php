@@ -3,7 +3,6 @@
 namespace Webster\Shop\Messages;
 
 use Ratchet\ConnectionInterface;
-use TechDivision\PersistenceContainerClient\Context\Connection\Factory;
 
 /**
  * <REPLACE WITH FILE DESCRIPTION>

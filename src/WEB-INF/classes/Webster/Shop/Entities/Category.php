@@ -18,6 +18,7 @@ namespace Webster\Shop\Entities;
 
 use JMS\Serializer\Annotation as JMS;
 use Doctrine\Search\Mapping\Annotations as MAP;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Webster\Shop\Entities\Category
@@ -37,7 +38,7 @@ use Doctrine\Search\Mapping\Annotations as MAP;
  * @JMS\ExclusionPolicy("all")
  * @MAP\ElasticSearchable(index="shop", type="category", source=true)
  */
-class Category
+class Category implements \JsonSerializable
 {
     /**
      * @MAP\Id
@@ -78,6 +79,7 @@ class Category
      * @JMS\Type("array")
      * @JMS\Expose
      * @MAP\ElasticField(type="string", includeInAll=false, index="not_analyzed")
+     * @ORM\ManyToMany(targetEntity="Product", inversedBy="categories")
      */
     private $products;
 
@@ -95,29 +97,12 @@ class Category
         $this->setProducts($data['products']);
     }
 
-    public static function createMapping($elasticaIndex)
-    {
-        require_once '/opt/appserver/webapps/webstershop/vendor/autoload.php';
-
-        //Create a type
-        $elasticaType = $elasticaIndex->getType(self::ELASTIC_TYPE);
-
-        // Define mapping
-        $mapping = new \Elastica\Type\Mapping();
-        $mapping->setType($elasticaType);
-        $mapping->setParam('index_analyzer', 'indexAnalyzer');
-        $mapping->setParam('search_analyzer', 'searchAnalyzer');
-
-        // Send mapping to type
-        $mapping->send();
-    }
-
     /**
      * Returns the category data as array
      *
      * @return array
      */
-    public function toArray()
+    public function jsonSerialize()
     {
         $result =  array(
             'id' => $this->getId(),

@@ -3,7 +3,7 @@
 namespace Webster\Shop\Handler;
 
 use Ratchet\ConnectionInterface;
-use TechDivision\ApplicationServer\Interfaces\ApplicationInterface;
+use Webster\Shop\Messages\ResponseMessage;
 
 /**
  * <REPLACE WITH FILE DESCRIPTION>
@@ -40,27 +40,58 @@ class Dispatcher
             throw new \Exception('The message is not correct.');
         }
 
-        $controllerClass = 'Webster\\Shop\\Controllers\\' . $message->type . 'Controller';
-        $persistenceClass = 'Webster\\Shop\\Persistence\\' . $message->type . 'Processor';
+        $classInfo = $this->_getClassInfo($message->type);
+        $controllerClass = 'Webster\\Shop\\' . $classInfo['module'] .'\\Controllers\\' . $classInfo['type'] . 'Controller';
         $action = $message->action . 'Action';
 
-        if(!class_exists($controllerClass) || !class_exists($persistenceClass)){
-            throw new \Exception('Controller or persistence class could not be found.' . $persistenceClass);
+        if(!class_exists($controllerClass)){
+            throw new \Exception('Controller class "' . $controllerClass . '" could not be found.');
         }
 
         $settings = $this->getSettings();
 
-        if(!array_key_exists('elasticsearch', $settings)){
-            throw new \Exception('No connection parameters for elasticsearch found.');
-        }
-
-        $processor = new $persistenceClass($settings['elasticsearch']);
-        $controller = new $controllerClass($connection, $processor);
-        $controller->$action($message->content);
+        $controller = new $controllerClass($settings);
+        $controller->$action($message->content, new ResponseMessage($connection));
     }
 
     public function getSettings()
     {
         return $this->settings;
+    }
+
+    /**
+     * Extracts class information out of a given class id like module and type.
+     *
+     * @param string $classId
+     * @return array
+     */
+    private function _getClassInfo($classId)
+    {
+        $result = array();
+
+        // if class id is valid extract module and type
+        if(strpos($classId, '/')){
+            $classArr = explode('/', trim($classId));
+            $module = $classArr[0];
+            $type = !empty($classArr[1]) ? $classArr[1] : null;
+
+            $result['module'] = $this->_ucwords($module, '\\');
+            $result['type'] = $this->_ucwords($type, '\\');
+        }
+
+        return $result;
+    }
+
+    /**
+     * Converts all words of a string to first letter upper case and replaces a given separator by another one.
+     *
+     * @param string $str The search string
+     * @param string $destSep The separator the string will contain afterwards
+     * @param string $srcSep The separator being replaced
+     * @return mixed
+     */
+    private function _ucwords($str, $destSep = '_', $srcSep = '_')
+    {
+        return str_replace(' ', $destSep, ucwords(str_replace($srcSep, ' ', $str)));
     }
 }
