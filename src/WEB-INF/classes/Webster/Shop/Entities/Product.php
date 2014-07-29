@@ -86,7 +86,6 @@ class Product implements \JsonSerializable
      * @JMS\Type("boolean")
      * @JMS\Expose
      * @MAP\ElasticField(type="boolean", includeInAll=false, index="no")
-     * @ORM\ManyToMany(targetEntity="Webster\Shop\Entities\ROFFEL", mappedBy="oida")
      */
     private $active;
 

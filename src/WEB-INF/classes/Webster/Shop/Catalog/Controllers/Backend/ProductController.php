@@ -36,10 +36,18 @@ class ProductController extends AbstractController
     public function saveAction($content, ResponseMessage $message)
     {
         $productData = $content->product;
+        $product = new Product($productData);
+
+        $categoryIds = array();
+        foreach($content->categories as $category){
+            $categoryIds[] = $category->id;
+        }
+
+        $product->setCategories($categoryIds);
         if($id = $productData->id){
-            $product = $this->getProcessor()->update(new Product($productData));
+            $product = $this->getProcessor()->update($product);
         } else {
-            $product = $this->getProcessor()->persist(new Product($productData));
+            $product = $this->getProcessor()->persist($product);
         }
 
         if($product){

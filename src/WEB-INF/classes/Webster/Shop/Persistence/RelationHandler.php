@@ -92,7 +92,7 @@ class RelationHandler implements EventSubscriber
         $oldEntity = $this->getReadAdapter()
             ->findById(get_class($entity), $type, $entity->getId());
 
-        foreach($md['fieldMappings'] as $thisAttributeName => $data){
+        foreach($md->fieldMappings as $thisAttributeName => $data){
             $otherAttributeName = null;
             if(isset($data->mappedBy)){
                 $otherAttributeName = $data->mappedBy;
@@ -101,46 +101,54 @@ class RelationHandler implements EventSubscriber
             }
 
             $targetEntity = $data->targetEntity;
-            $oldIds = $oldEntity->{'get' . ucfirst($thisAttributeName)}();
-            $newIds = $entity->{'get' . ucfirst($thisAttributeName)}();
+            $oldIds = $this->_read($oldEntity, $thisAttributeName);
+            $entityIds = $this->_read($entity, $thisAttributeName);
 
-            $deleteIds = array_diff($oldIds, $newIds);
-            $newIds = array_diff($newIds, $oldIds);
+            if(!is_array($oldIds)){
+                $deleteIds = array();
+                $newIds = $entityIds;
+            }
+            if(!is_array($entityIds)){
+                $newIds = array();
+                $deleteIds = $oldIds;
+            }
+            if(is_array($oldIds) && is_array($entityIds)){
+                $deleteIds = array_diff($oldIds, $entityIds);
+                $newIds = array_diff($entityIds, $oldIds);
+            }
 
             $type = $sm->getClassMetadata(get_class($entity))->type;
 
             $className = $this->_className($md->className);
 
-            foreach($this->getReadAdapter()->findAll($targetEntity, $type, $deleteIds) as $deleteEntity){
-                $deleteEntity->{'remove' . $className}($entity);
-                $sm->persist($deleteEntity);
+            if(!empty($deleteIds)){
+                foreach($this->getReadAdapter()->findAll($targetEntity, $type, $deleteIds) as $deleteEntity){
+                    $holder = $this->_read($deleteEntity, $otherAttributeName);
+
+                    if( ($key = array_search($entity->getId(), $holder)) ){
+                        unset($holder[$key]);
+                    }
+
+                    $this->_write($deleteEntity, $otherAttributeName, $holder);
+
+                    $sm->persist($deleteEntity);
+                }
             }
 
-            foreach($this->getReadAdapter()->findAll($targetEntity, $type, $newIds) as $newEntity){
-                $newEntity->{'add' . $this->_className($className)}($entity);
-                $sm->persist($newEntity);
+            error_log(var_export($newIds, true));
+            if(!empty($newIds)){
+                foreach($this->getReadAdapter()->findAll($targetEntity, $type, $newIds) as $newEntity){
+                    error_log(var_export($newEntity, true));
+                    $holder = $this->_read($newEntity, $otherAttributeName);
+
+                    $holder[] = $entity->getId();
+
+                    error_log(var_export($newEntity, true));
+                    $this->_write($newEntity, $otherAttributeName, $holder);
+                    $sm->persist($newEntity);
+                }
             }
         }
-
-
-//        $oldProduct = $this->findById($product->getId());
-//        $oldCategories = $oldProduct->getCategories();
-//        $categories = $product->getCategories();
-//
-//        $deleteCategoryIds = array_diff($oldCategories, $categories);
-//        $newCategoryIds = array_diff($categories, $oldCategories);
-//
-//        $categoryProcessor = new CategoryProcessor($this->getConnectionParameters());
-//
-//        foreach($categoryProcessor->findAll($deleteCategoryIds) as $category){
-//            $category->removeProduct($product);
-//            $categoryProcessor->persist($category);
-//        }
-//
-//        foreach($categoryProcessor->findAll($newCategoryIds) as $category){
-//            $category->addProduct($product);
-//            $categoryProcessor->persist($category);
-//        }
 
 
 
@@ -212,6 +220,23 @@ class RelationHandler implements EventSubscriber
      */
     protected function _className($name)
     {
-        return end(explode('\\', get_class($name)));
+        return end(explode('\\', $name));
+    }
+
+    protected function _read($object, $property)
+    {
+        $value = & \Closure::bind(function & () use ($property) {
+            return $this->$property;
+        }, $object, $object)->__invoke();
+        return $value;
+    }
+
+    protected function _write($object, $property, $value)
+    {
+        $value = & \Closure::bind(function & () use ($property, $value) {
+            $this->$property = $value;
+            return $this->$property;
+        }, $object, $object)->__invoke();
+        return $value;
     }
 }
