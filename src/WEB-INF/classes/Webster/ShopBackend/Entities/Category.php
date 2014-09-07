@@ -16,9 +16,7 @@
 
 namespace Webster\Shop\Entities;
 
-use JMS\Serializer\Annotation as JMS;
-use Doctrine\Search\Mapping\Annotations as MAP;
-use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * Webster\Shop\Entities\Category
@@ -34,53 +32,25 @@ use Doctrine\ORM\Mapping as ORM;
  *             Open Software License (OSL 3.0)
  * @link       http://www.techdivision.com/
  */
-/**
- * @JMS\ExclusionPolicy("all")
- * @MAP\ElasticSearchable(index="shop", type="category", source=true)
- */
+/** @ODM\Document */
 class Category implements \JsonSerializable
 {
-    /**
-     * @MAP\Id
-     * @JMS\Type("string")
-     * @JMS\Expose
-     */
+    /** @ODM\Id */
     private $id;
 
-    /**
-     * @JMS\Type("string")
-     * @JMS\Expose
-     * @MAP\ElasticField(type="string", includeInAll=false, index="no")
-     */
+    /** @ODM\String */
     private $name;
 
-    /**
-     * @JMS\Type("string")
-     * @JMS\Expose
-     * @MAP\ElasticField(type="string", includeInAll=false, index="no")
-     */
+    /** @ODM\String */
     private $description;
 
-    /**
-     * @JMS\Type("boolean")
-     * @JMS\Expose
-     * @MAP\ElasticField(type="boolean", includeInAll=false, index="no")
-     */
+    /** @ODM\Boolean */
     private $active;
 
-    /**
-     * @JMS\Type("string")
-     * @JMS\Expose
-     * @MAP\ElasticField(type="string", includeInAll=false, index="no")
-     */
+    /** @ODM\String */
     private $image;
 
-    /**
-     * @JMS\Type("array")
-     * @JMS\Expose
-     * @MAP\ElasticField(type="string", includeInAll=false, index="not_analyzed")
-     * @ORM\ManyToMany(targetEntity="Product", inversedBy="categories")
-     */
+    /** @ODM\ReferenceMany(targetDocument="Product", cascade="all") */
     private $products;
 
     public function __construct($data)

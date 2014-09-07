@@ -1,20 +1,23 @@
 <?php
 
-namespace Webster\Shop\Handler;
+namespace Webster\ShopBackend\Handler;
 
 use Ratchet\ConnectionInterface;
+use Symfony\Component\Process\Process;
 use TechDivision\WebSocketContainer\Handlers\HandlerConfig;
 use TechDivision\WebSocketContainer\Handlers\AbstractHandler;
 use Webster\Shop\Handler\Dispatcher;
+use Noodlehaus\Config;
+use Webster\ShopBackend\Persistence\ProcessorFactory;
 
 class SocketHandler extends AbstractHandler
 {
     /**
-     * The key for the context param with the name of the settings file.
+     * The key for the context param with the name of the configuration file.
      *
      * @var string
      */
-    const SETTINGS_FILE = 'settingsFile';
+    const CONFIG_FILE_KEY = 'configFile';
 
     /**
      * @var  $dispatcher Dispatcher
@@ -24,17 +27,21 @@ class SocketHandler extends AbstractHandler
     /**
      * @param HandlerConfig $config
      */
-    public function init(HandlerConfig $config)
+    public function init(HandlerConfig $handlerConfig)
     {
         error_log('SocketHandler, init');
-        parent::init($config);
+        parent::init($handlerConfig);
 
-        $settingsFile = $this->getHandlerManager()->getInitParameter(self::SETTINGS_FILE);
-        $settings = parse_ini_file(
-            $this->getApplication()->getWebappPath() . DIRECTORY_SEPARATOR . $settingsFile,
-            true
-        );
-        $this->dispatcher = new Dispatcher($settings);
+        // get path to configuration file
+        $configFile = $this->getApplication()->getWebappPath()
+            . DIRECTORY_SEPARATOR
+            . $this->getHandlerManager()->getInitParameter(self::CONFIG_FILE_KEY);
+
+        // load the configuration file
+        $config = new Config($configFile);
+
+        // initialize dispatcher with current configuration
+        $this->dispatcher = new Dispatcher($config, new ProcessorFactory($config));
     }
 
     /**

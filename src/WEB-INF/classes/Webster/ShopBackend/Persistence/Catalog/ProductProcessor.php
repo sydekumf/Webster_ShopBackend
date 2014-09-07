@@ -35,6 +35,26 @@ use Webster\Shop\Persistence\AbstractProcessor;
  */
 class ProductProcessor extends AbstractProcessor
 {
+    public function findAll()
+    {
+        $dm = $this->getDocumentManager();
+
+        $products = $dm->getRepository('Webster\Shop\Entities\Product')
+            ->findAll()
+            ->toArray(false);
+
+        error_log(var_export($products, true));
+
+        return $products;
+    }
+
+    public function findById($id)
+    {
+        $dm = $this->getDocumentManager();
+        $product = $dm->getRepository('Webster\Shop\Entities\Product')->find($id);
+        return $product;
+    }
+
     public function update(Product $product)
     {
         $this->persist($product);

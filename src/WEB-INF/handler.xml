@@ -17,8 +17,8 @@
     </handler-mapping>
 
     <context-param>
-        <param-name>settingsFile</param-name>
-        <param-value>WEB-INF/settings.properties</param-value>
+        <param-name>configFile</param-name>
+        <param-value>WEB-INF/var/config.json</param-value>
     </context-param>
 
 </web-app>

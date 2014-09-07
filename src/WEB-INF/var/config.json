@@ -1,0 +1,15 @@
+{
+    "namespace": "Webster\\ShopBackend",
+    "persistence": {
+        "proxy_dir": "/opt/appserver/webapps/shop/WEB-INF/classes/Webster/Shop/Entities/Proxies",
+        "proxy_namespace": "Webster\\Shop\\Entities\\Proxies",
+        "hydrator_dir": "/opt/appserver/webapps/shop/WEB-INF/classes/Webster/Shop/Entities/Hydrators",
+        "hydrator_namepsace": "Webster\\Shop\\Entities\\Hydrators",
+        "entity_path": "/opt/appserver/webapps/shop/WEB-INF/classes/Webster/Shop/Entities/",
+        "database": "shop"
+    },
+    "processors": [
+        {"catalog/product": "Catalog\\Product"},
+        {"catalog/category": "Catalog\\Category"}
+    ]
+}

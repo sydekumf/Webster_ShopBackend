@@ -3,27 +3,16 @@
     "type": "project",
     "description": "Webshop",
     "version": "0.1.0",
-    "repositories":[
-        {
-            "type":"vcs",
-            "url":"http://github.com/sydekumf/search"
-        }
-    ],
     "require": {
-        "doctrine/common":"2.3.*",
-        "doctrine/dbal":"2.3.*",
-        "jms/serializer":"0.15.0",
-        "ruflin/elastica":"v1.0.1.2",
-        "doctrine/search":"dev-master"
+        "ruflin/elastica": "v1.0.1.2",
+        "doctrine/mongodb-odm": "1.0.0-beta9",
+        "noodlehaus/config": "dev-master",
+        "phpunit/phpunit": "3.7.14"
     },
     "authors": [
         {
             "name": "Florian Sydekum",
             "email": "fs@techdivision.com"
-        },
-        {
-            "name": "Matthias Witte",
-            "email": "mw@techdivision.com"
         }
     ]
 }

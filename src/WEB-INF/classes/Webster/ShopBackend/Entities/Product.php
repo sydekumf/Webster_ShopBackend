@@ -16,9 +16,7 @@
 
 namespace Webster\Shop\Entities;
 
-use JMS\Serializer\Annotation as JMS;
-use Doctrine\Search\Mapping\Annotations as MAP;
-use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
  * Webster\Shop\Entities\Product
@@ -34,68 +32,29 @@ use Doctrine\ORM\Mapping as ORM;
  *             Open Software License (OSL 3.0)
  * @link       http://www.techdivision.com/
  */
-/**
- * @JMS\ExclusionPolicy("all")
- * @MAP\ElasticSearchable(index="shop", type="product", source=true)
- */
+/** @ODM\Document */
 class Product implements \JsonSerializable
 {
-    /**
-     * @MAP\Id
-     * @JMS\Type("string")
-     * @JMS\Expose
-     */
+    /** @ODM\Id */
     private $id;
 
-    /**
-     * @JMS\Type("string")
-     * @JMS\Expose
-     * @MAP\ElasticField(type="string", includeInAll=false, index="no")
-     */
+    /** @ODM\String */
     private $name;
 
-    /**
-     * @JMS\Type("double")
-     * @JMS\Expose
-     * @MAP\ElasticField(type="float", includeInAll=false, index="no")
-     */
+    /** @ODM\Float */
     private $price;
 
-    /**
-     * @JMS\Type("integer")
-     * @JMS\Expose
-     * @MAP\ElasticField(type="integer", includeInAll=false, index="no")
-     */
+    /** @ODM\Int */
     private $inventory;
 
-    /**
-     * @JMS\Type("string")
-     * @JMS\Expose
-     * @MAP\ElasticField(type="string", includeInAll=false, index="no")
-     */
+    /** @ODM\String */
     private $description;
 
-    /**
-     * @JMS\Type("string")
-     * @JMS\Expose
-     * @MAP\ElasticField(type="string", includeInAll=false, index="no")
-     */
+    /** @ODM\String */
     private $image;
 
-    /**
-     * @JMS\Type("boolean")
-     * @JMS\Expose
-     * @MAP\ElasticField(type="boolean", includeInAll=false, index="no")
-     */
+    /** @ODM\Boolean */
     private $active;
-
-    /**
-     * @JMS\Type("array")
-     * @JMS\Expose
-     * @MAP\ElasticField(type="string", includeInAll=false, index="not_analyzed")
-     * @ORM\ManyToMany(targetEntity="Webster\Shop\Entities\Category", mappedBy="products")
-     */
-    private $categories;
 
     public function __construct($data)
     {
@@ -110,7 +69,6 @@ class Product implements \JsonSerializable
         $this->setDescription($data['description']);
         $this->setImage($data['image']);
         $this->setActive($data['active']);
-        $this->setCategories($data['categories']);
     }
 
     /**
@@ -127,8 +85,7 @@ class Product implements \JsonSerializable
             'inventory' => $this->getInventory(),
             'description' => $this->getDescription(),
             'image' => $this->getImage(),
-            'active' => $this->getActive(),
-            'categories' => $this->getCategories()
+            'active' => $this->getActive()
         );
 
         // delete null entries
@@ -250,21 +207,5 @@ class Product implements \JsonSerializable
     public function getActive()
     {
         return $this->active;
-    }
-
-    /**
-     * @param mixed $categories
-     */
-    public function setCategories($categories)
-    {
-        $this->categories = $categories;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getCategories()
-    {
-        return $this->categories;
     }
 }

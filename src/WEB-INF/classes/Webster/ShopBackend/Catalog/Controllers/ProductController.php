@@ -1,6 +1,6 @@
 <?php
 
-namespace Webster\Shop\Catalog\Controllers\Backend;
+namespace Webster\ShopBackend\Catalog\Controllers;
 
 use Webster\Shop\Controllers\AbstractController;
 use Webster\Shop\Entities\Category;

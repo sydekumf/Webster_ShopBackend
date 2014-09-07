@@ -35,7 +35,33 @@ use Webster\Shop\Persistence\AbstractProcessor;
  */
 class CategoryProcessor extends AbstractProcessor
 {
-    const ELASTIC_TYPE = 'category';
+    public function findAll()
+    {
+        $dm = $this->getDocumentManager();
+
+        $categories = $dm->getRepository('Webster\Shop\Entities\Category')
+            ->findAll()
+            ->toArray(false);
+
+        foreach($categories as $c){
+            $products = $c->getProducts();
+//            foreach($products as $p){
+//                error_log($p->getName());
+//            }
+        }
+//        error_log(var_export($categories, true));
+
+//        $c = $dm->getRepository('Webster\Shop\Entities\Category')
+//            ->find('53d943d722b58320444f05bc');
+
+//        $a = $c->getProducts();
+//        foreach($a as $product){
+//            error_log($product->getName());
+//        }
+//        error_log('oida');
+
+//        return $categories;
+    }
 
 //    /**
 //     * Returns all found categories.
