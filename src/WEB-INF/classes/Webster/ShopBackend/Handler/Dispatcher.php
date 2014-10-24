@@ -3,7 +3,7 @@
 namespace Webster\ShopBackend\Handler;
 
 use Ratchet\ConnectionInterface;
-use Webster\Shop\Messages\ResponseMessage;
+use Webster\ShopBackend\Messages\ResponseMessage;
 use Noodlehaus\Config;
 use Webster\ShopBackend\Persistence\ProcessorFactory;
 
@@ -71,7 +71,7 @@ class Dispatcher
 
         // extract controller and action from message
         $classInfo = $this->getClassInfo($message->type);
-        $controllerClass = $config->get('namespace') . '\\Controllers\\' . $classInfo['module'] . $classInfo['type'] . 'Controller';
+        $controllerClass = $config->get('namespace') . '\\Controllers\\' . $classInfo['module'] . '\\' . $classInfo['type'] . 'Controller';
         $action = $message->action . 'Action';
 
         // check class and action

@@ -107,6 +107,14 @@ class DispatcherTest extends PHPUnit_Framework_TestCase
      */
     public function testDispatchMessage_controllerClassNotFound()
     {
+        $this->_dispatcher->dispatchMessage('{"type":"not/found", "action":"test"}', $this->_connectionInterface);
+    }
+
+    /**
+     * @expectedException Exception
+     */
+    public function testDispatchMessage_actionFunctionNotFound()
+    {
         $this->_dispatcher->dispatchMessage('{"type":"catalog/category", "action":"test"}', $this->_connectionInterface);
     }
 

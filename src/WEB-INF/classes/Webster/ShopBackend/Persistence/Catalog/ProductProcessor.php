@@ -14,13 +14,13 @@
  * @link       http://www.techdivision.com/
  */
 
-namespace Webster\Shop\Persistence\Catalog;
+namespace Webster\ShopBackend\Persistence\Catalog;
 
-use Webster\Shop\Entities\Product;
-use Webster\Shop\Persistence\AbstractProcessor;
+use Webster\ShopBackend\Entities\Product;
+use Webster\ShopBackend\Persistence\AbstractProcessor;
 
 /**
- * Webster\Shop\Services\ProductProcessor
+ * Webster\ShopBackend\Services\ProductProcessor
  *
  * Product processor class
  *
@@ -39,11 +39,8 @@ class ProductProcessor extends AbstractProcessor
     {
         $dm = $this->getDocumentManager();
 
-        $products = $dm->getRepository('Webster\Shop\Entities\Product')
-            ->findAll()
-            ->toArray(false);
-
-        error_log(var_export($products, true));
+        $products = $dm->getRepository('Webster\ShopBackend\Entities\Product')
+            ->findAll();
 
         return $products;
     }
@@ -51,32 +48,8 @@ class ProductProcessor extends AbstractProcessor
     public function findById($id)
     {
         $dm = $this->getDocumentManager();
-        $product = $dm->getRepository('Webster\Shop\Entities\Product')->find($id);
+        $product = $dm->getRepository('Webster\ShopBackend\Entities\Product')->find($id);
         return $product;
-    }
-
-    public function update(Product $product)
-    {
-        $this->persist($product);
-
-//        $oldProduct = $this->findById($product->getId());
-//        $oldCategories = $oldProduct->getCategories();
-//        $categories = $product->getCategories();
-//
-//        $deleteCategoryIds = array_diff($oldCategories, $categories);
-//        $newCategoryIds = array_diff($categories, $oldCategories);
-//
-//        $categoryProcessor = new CategoryProcessor($this->getConnectionParameters());
-//
-//        foreach($categoryProcessor->findAll($deleteCategoryIds) as $category){
-//            $category->removeProduct($product);
-//            $categoryProcessor->persist($category);
-//        }
-//
-//        foreach($categoryProcessor->findAll($newCategoryIds) as $category){
-//            $category->addProduct($product);
-//            $categoryProcessor->persist($category);
-//        }
     }
 
 //    /**
@@ -110,18 +83,22 @@ class ProductProcessor extends AbstractProcessor
     /**
      * Persists the passed entity.
      *
-     * @param Product $product The entity to persist
+     * @param mixed $product The entity to persist
      * @return Product The persisted entity
      */
-    public function persist(Product $product)
+    public function persist($product)
     {
-        require_once '/opt/appserver/webapps/shop/vendor/autoload.php';
+        $dm = $this->getDocumentManager();
 
-        /* @var $sm Doctrine\Search\SearchManager */
-        $sm = $this->getSearchManager();
+        if(is_array($product)){
+            foreach($product as $p){
+                $dm->persist($p);
+            }
+        } else if($product instanceof Product){
+            $dm->persist($product);
+        }
 
-        $sm->persist($product);
-        $sm->flush();
+        $dm->flush();
 
         return $product;
     }
@@ -137,7 +114,7 @@ class ProductProcessor extends AbstractProcessor
 //
 //        $sm = $this->getSearchManager();
 //
-//        $category = $sm->getRepository('Webster\Shop\Entities\Category')->find($categoryId);
+//        $category = $sm->getRepository('Webster\ShopBackend\Entities\Category')->find($categoryId);
 //        $productIds = $category->getProducts();
 //
 //        foreach($productIds as $id){

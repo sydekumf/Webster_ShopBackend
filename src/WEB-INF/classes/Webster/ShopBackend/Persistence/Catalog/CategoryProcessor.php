@@ -14,13 +14,13 @@
  * @link       http://www.techdivision.com/
  */
 
-namespace Webster\Shop\Persistence\Catalog;
+namespace Webster\ShopBackend\Persistence\Catalog;
 
-use Webster\Shop\Entities\Category;
-use Webster\Shop\Persistence\AbstractProcessor;
+use Webster\ShopBackend\Entities\Category;
+use Webster\ShopBackend\Persistence\AbstractProcessor;
 
 /**
- * Webster\Shop\Services\CategoryProcessor
+ * Webster\ShopBackend\Services\CategoryProcessor
  *
  * Category processor class
  *
@@ -35,32 +35,31 @@ use Webster\Shop\Persistence\AbstractProcessor;
  */
 class CategoryProcessor extends AbstractProcessor
 {
-    public function findAll()
+    public function findAll($ids = null)
     {
         $dm = $this->getDocumentManager();
 
-        $categories = $dm->getRepository('Webster\Shop\Entities\Category')
-            ->findAll()
-            ->toArray(false);
-
-        foreach($categories as $c){
-            $products = $c->getProducts();
-//            foreach($products as $p){
-//                error_log($p->getName());
-//            }
+        if(is_array($ids)){
+            $categories = $dm->createQueryBuilder('Webster\ShopBackend\Entities\Category')
+                ->field('_id')
+                ->in($ids)
+                ->getQuery()
+                ->execute();
+        } else {
+            $categories = $dm->getRepository('Webster\ShopBackend\Entities\Category')
+                ->findAll();
         }
-//        error_log(var_export($categories, true));
 
-//        $c = $dm->getRepository('Webster\Shop\Entities\Category')
-//            ->find('53d943d722b58320444f05bc');
+        return $categories;
+    }
 
-//        $a = $c->getProducts();
-//        foreach($a as $product){
-//            error_log($product->getName());
-//        }
-//        error_log('oida');
+    public function find($id)
+    {
+        $dm = $this->getDocumentManager();
 
-//        return $categories;
+        $category = $dm->getRepository('Webster\ShopBackend\Entities\Category')->find($id);
+
+        return $category;
     }
 
 //    /**
@@ -94,18 +93,22 @@ class CategoryProcessor extends AbstractProcessor
     /**
      * Persists the passed entity.
      *
-     * @param Category $category The entity to persist
+     * @param mixed $category The entity to persist
      * @return Category The persisted entity
      */
-    public function persist(Category $category)
+    public function persist($category)
     {
-        require_once '/opt/appserver/webapps/shop/vendor/autoload.php';
+        $dm = $this->getDocumentManager();
 
-        /* @var $sm Doctrine\Search\SearchManager */
-        $sm = $this->getSearchManager();
+        if(is_array($category)){
+            foreach($category as $c){
+                $dm->persist($c);
+            }
+        } else if($category instanceof Category){
+            $dm->persist($category);
+        }
 
-        $sm->persist($category);
-        $sm->flush();
+        $dm->flush();
 
         return $category;
     }

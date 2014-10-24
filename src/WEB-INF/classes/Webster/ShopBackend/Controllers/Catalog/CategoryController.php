@@ -1,12 +1,10 @@
 <?php
 
-namespace Webster\Shop\Controllers\Catalog;
+namespace Webster\ShopBackend\Controllers\Catalog;
 
-use Webster\Shop\Controllers\AbstractController;
-use Webster\Shop\Messages\CategoryMessage;
-use Webster\Shop\Entities\Category;
-use Webster\Shop\Persistence\Catalog\CategoryProcessor;
-use Ratchet\ConnectionInterface;
+use Webster\ShopBackend\Controllers\AbstractController;
+use Webster\ShopBackend\Messages\ResponseMessage;
+use Webster\ShopBackend\Persistence\Catalog\CategoryProcessor;
 
 /**
  * <REPLACE WITH FILE DESCRIPTION>
@@ -24,42 +22,57 @@ use Ratchet\ConnectionInterface;
  */
 class CategoryController extends AbstractController
 {
-    public function __construct(ConnectionInterface $connection, $settings)
+    /**
+     * @var CategoryProcessor $_categoryProcessor Holds the category processor
+     */
+    private $_categoryProcessor;
+
+    /**
+     * @inherit
+     */
+    protected function _init()
     {
-        parent::__construct($connection, $settings);
-        $this->setProcessor(new CategoryProcessor($this->getSettings()));
+        $this->_categoryProcessor = $this->getProcessorFactory()->get('category');
     }
 
-    public function getAction($content)
+    public function indexAction($content, ResponseMessage $message)
     {
-        if($categoryId = $content->category_id){
-            $categories = $this->getProcessor()->findById($categoryId);
-        } else {
-            $categories = $this->getProcessor()->findAll();
-        }
+        $categories = $this->_categoryProcessor->findAll();
 
-        $categoryMessage = new CategoryMessage($categories);
-        $categoryMessage->send($this->websocketConnection);
+        $message->addContent('products', $categories)
+            ->send();
     }
 
-    public function saveAction($content)
-    {
-        if(is_array($content)){
-            $result = array();
-            foreach($content as $category){
-                $result[] = $this->saveCategory($category);
-            }
-        } else {
-            $result = $this->saveCategory($content);
-        }
-
-        $categoryMessage = new CategoryMessage($result);
-        $categoryMessage->send($this->websocketConnection);
-    }
-
-    private function saveCategory($data)
-    {
-        $category = new Category($data);
-        return $this->getProcessor()->persist($category);
-    }
+//    public function getAction($content)
+//    {
+//        if($categoryId = $content->category_id){
+//            $categories = $this->getProcessor()->findById($categoryId);
+//        } else {
+//            $categories = $this->getProcessor()->findAll();
+//        }
+//
+//        $categoryMessage = new CategoryMessage($categories);
+//        $categoryMessage->send($this->websocketConnection);
+//    }
+//
+//    public function saveAction($content)
+//    {
+//        if(is_array($content)){
+//            $result = array();
+//            foreach($content as $category){
+//                $result[] = $this->saveCategory($category);
+//            }
+//        } else {
+//            $result = $this->saveCategory($content);
+//        }
+//
+//        $categoryMessage = new CategoryMessage($result);
+//        $categoryMessage->send($this->websocketConnection);
+//    }
+//
+//    private function saveCategory($data)
+//    {
+//        $category = new Category($data);
+//        return $this->getProcessor()->persist($category);
+//    }
 }

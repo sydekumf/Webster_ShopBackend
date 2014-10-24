@@ -14,12 +14,12 @@
  * @link       http://www.techdivision.com/
  */
 
-namespace Webster\Shop\Entities;
+namespace Webster\ShopBackend\Entities;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
- * Webster\Shop\Entities\Category
+ * Webster\ShopBackend\Entities\Category
  *
  * A product entity
  *
@@ -50,11 +50,13 @@ class Category implements \JsonSerializable
     /** @ODM\String */
     private $image;
 
-    /** @ODM\ReferenceMany(targetDocument="Product", cascade="all") */
+    /** @ODM\ReferenceMany(targetDocument="Product", inversedBy="categories", simple=true, strategy="addToSet") */
     private $products;
 
     public function __construct($data)
     {
+        $this->products = array();
+
         if(is_object($data)){
             $data = get_object_vars($data);
         }
@@ -64,7 +66,7 @@ class Category implements \JsonSerializable
         $this->setDescription($data['description']);
         $this->setActive($data['active']);
         $this->setImage($data['image']);
-        $this->setProducts($data['products']);
+        $this->addProducts($data['products']);
     }
 
     /**
@@ -74,13 +76,18 @@ class Category implements \JsonSerializable
      */
     public function jsonSerialize()
     {
+        $products = array();
+        foreach($this->getProducts() as $product){
+            $products[] = $product;
+        }
+
         $result =  array(
             'id' => $this->getId(),
             'name' => $this->getName(),
             'description' => $this->getDescription(),
             'active' => $this->getActive(),
             'image' => $this->getImage(),
-            'products' => $this->getProducts()
+            'products' => $products
         );
 
         // delete null entries
@@ -90,6 +97,46 @@ class Category implements \JsonSerializable
             }
         }
         return $result;
+    }
+
+    public function addProduct(Product $product)
+    {
+        $productId = $product->getId();
+        if(!array_key_exists($productId, $this->products)){
+            $this->products[$product->getId()] = $product;
+        }
+    }
+
+    public function addProducts($products)
+    {
+        if(is_array($products)){
+            foreach($products as $product){
+                if($product instanceof Product){
+                    $this->addProduct($product);
+                }
+            }
+        }
+    }
+
+    public function removeProduct(Product $product)
+    {
+        $productId = $product->getId();
+        if(array_key_exists($productId, $this->products)){
+            unset($this->products[$productId]);
+        }
+    }
+
+    public function getProductIds()
+    {
+        $products = $this->getProducts();
+        $mongoData = $products->getMongoData();
+        $productIds = array();
+
+        foreach($mongoData as $mongoId){
+            $productIds[] = $mongoId->{'$id'};
+        }
+
+        return $productIds;
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace Webster\Shop\Persistence;
+namespace Webster\ShopBackend\Persistence;
 
 /**
  * <REPLACE WITH FILE DESCRIPTION>

@@ -1,6 +1,6 @@
 <?php
 
-namespace Webster\Shop\Messages;
+namespace Webster\ShopBackend\Messages;
 
 use Ratchet\ConnectionInterface;
 

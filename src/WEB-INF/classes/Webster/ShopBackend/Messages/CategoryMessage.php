@@ -1,10 +1,10 @@
 <?php
 
-namespace Webster\Shop\Messages;
+namespace Webster\ShopBackend\Messages;
 
-use Webster\Shop\Messages\AbstractMessage;
+use Webster\ShopBackend\Messages\AbstractMessage;
 use Ratchet\ConnectionInterface;
-use Webster\Shop\Entities\Category;
+use Webster\ShopBackend\Entities\Category;
 
 /**
  * The message handling categories.

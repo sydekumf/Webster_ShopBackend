@@ -3,10 +3,9 @@
 namespace Webster\ShopBackend\Handler;
 
 use Ratchet\ConnectionInterface;
-use Symfony\Component\Process\Process;
 use TechDivision\WebSocketContainer\Handlers\HandlerConfig;
 use TechDivision\WebSocketContainer\Handlers\AbstractHandler;
-use Webster\Shop\Handler\Dispatcher;
+use Webster\ShopBackend\Handler\Dispatcher;
 use Noodlehaus\Config;
 use Webster\ShopBackend\Persistence\ProcessorFactory;
 
@@ -29,6 +28,8 @@ class SocketHandler extends AbstractHandler
      */
     public function init(HandlerConfig $handlerConfig)
     {
+        require_once '/opt/appserver/webapps/shop/vendor/autoload.php';
+
         error_log('SocketHandler, init');
         parent::init($handlerConfig);
 

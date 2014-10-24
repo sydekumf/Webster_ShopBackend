@@ -5,7 +5,7 @@
     "version": "0.1.0",
     "require": {
         "ruflin/elastica": "v1.0.1.2",
-        "doctrine/mongodb-odm": "1.0.0-beta9",
+        "doctrine/mongodb-odm": "1.0.0beta11",
         "noodlehaus/config": "dev-master",
         "phpunit/phpunit": "3.7.14"
     },

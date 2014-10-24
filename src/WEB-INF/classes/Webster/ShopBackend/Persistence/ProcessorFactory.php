@@ -36,9 +36,9 @@ class ProcessorFactory
     private $_processors;
 
     /**
-     * @var DocumentManager $_dm Holds the document manager.
+     * @var string $_namespace Holds the namespace for classes.
      */
-    private $_dm;
+    private $_namespace;
 
     /**
      * Constructs the processor factory.
@@ -49,7 +49,7 @@ class ProcessorFactory
     {
         $this->_config = $config->get('persistence');
         $this->_processors = $config->get('processors');
-        $this->_setupDoctrine();
+        $this->_namespace = $config->get('namespace');
     }
 
     /**
@@ -67,8 +67,7 @@ class ProcessorFactory
         }
 
         // get the processor class name
-        $ns = $this->_config['namespace'];
-        $processorClass = $ns . '\\' . $this->_processors[$key];
+        $processorClass = $this->_namespace . '\\Persistence\\' . $this->_processors[$key] . 'Processor';
 
         // check if processor class exists
         if(!class_exists($processorClass)){
@@ -76,15 +75,17 @@ class ProcessorFactory
         }
 
         // initialize the processor
-        $processor = new $processorClass($this->_dm);
+        $processor = new $processorClass($this->_getDocumentManager());
 
         return $processor;
     }
 
     /**
-     * Initializes and sets up doctrine for mongodb.
+     * Initializes and sets up doctrine for mongodb. Returns a document manager instance
+     *
+     * @return DocumentManager
      */
-    protected function _setUpDoctrine()
+    protected function _getDocumentManager()
     {
         require_once '/opt/appserver/webapps/shop/vendor/autoload.php';
 
@@ -98,6 +99,6 @@ class ProcessorFactory
         $config->setMetadataDriverImpl(AnnotationDriver::create($this->_config['entity_path']));
         $config->setDefaultDB($this->_config['database']);
 
-        $this->_dm = DocumentManager::create(new Connection(), $config);
+        return DocumentManager::create(new Connection(), $config);
     }
 }

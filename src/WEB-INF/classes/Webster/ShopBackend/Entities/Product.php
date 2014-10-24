@@ -14,12 +14,12 @@
  * @link       http://www.techdivision.com/
  */
 
-namespace Webster\Shop\Entities;
+namespace Webster\ShopBackend\Entities;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 /**
- * Webster\Shop\Entities\Product
+ * Webster\ShopBackend\Entities\Product
  *
  * A product entity
  *
@@ -56,8 +56,13 @@ class Product implements \JsonSerializable
     /** @ODM\Boolean */
     private $active;
 
+    /** @ODM\ReferenceMany(targetDocument="Category", mappedBy="products", simple=true) */
+    private $categories;
+
     public function __construct($data)
     {
+        $this->categories = array();
+
         if(is_object($data)){
             $data = get_object_vars($data);
         }
@@ -69,6 +74,7 @@ class Product implements \JsonSerializable
         $this->setDescription($data['description']);
         $this->setImage($data['image']);
         $this->setActive($data['active']);
+        $this->addCategories($data['categories']);
     }
 
     /**
@@ -78,6 +84,11 @@ class Product implements \JsonSerializable
      */
     public function jsonSerialize()
     {
+//        $categories = array();
+//        foreach($this->getCategories() as $category){
+//            $categories[] = $category;
+//        }
+
         $result =  array(
             'id' => $this->getId(),
             'name' => $this->getName(),
@@ -85,7 +96,8 @@ class Product implements \JsonSerializable
             'inventory' => $this->getInventory(),
             'description' => $this->getDescription(),
             'image' => $this->getImage(),
-            'active' => $this->getActive()
+            'active' => $this->getActive(),
+            'categories' => $this->getCategories()
         );
 
         // delete null entries
@@ -95,6 +107,33 @@ class Product implements \JsonSerializable
             }
         }
         return $result;
+    }
+
+    public function addCategory(Category $category)
+    {
+        $categoryId = $category->getId();
+        if(!array_key_exists($categoryId, $this->categories)){
+            $this->categories[$category->getId()] = $category;
+        }
+    }
+
+    public function addCategories($categories)
+    {
+        if(is_array($categories)){
+            foreach($categories as $category){
+                if($category instanceof Category){
+                    $this->addCategory($category);
+                }
+            }
+        }
+    }
+
+    public function removeCategory(Category $category)
+    {
+        $categoryId = $category->getId();
+        if(array_key_exists($categoryId, $this->categories)){
+            unset($this->categories[$categoryId]);
+        }
     }
 
     /**
@@ -207,5 +246,21 @@ class Product implements \JsonSerializable
     public function getActive()
     {
         return $this->active;
+    }
+
+    /**
+     * @param mixed $categories
+     */
+    public function setCategories($categories)
+    {
+        $this->categories = $categories;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCategories()
+    {
+        return $this->categories;
     }
 }

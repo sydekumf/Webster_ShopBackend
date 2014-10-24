@@ -8,7 +8,7 @@
         <description><![CDATA[Handler to handle the socket]]></description>
         <display-name>SocketHandler</display-name>
         <handler-name>SocketHandler</handler-name>
-        <handler-class>\Webster\Shop\Handler\SocketHandler</handler-class>
+        <handler-class>\Webster\ShopBackend\Handler\SocketHandler</handler-class>
     </handler>
 
     <handler-mapping>
